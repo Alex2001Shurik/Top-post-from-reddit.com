@@ -1,5 +1,6 @@
 package com.toppostsfromredditcom;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -11,6 +12,7 @@ import com.toppostsfromredditcom.model.children.Children;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ListAdapter;
 
 import android.text.Editable;
 import android.util.Log;
@@ -19,7 +21,9 @@ import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.toppostsfromredditcom.model.children.Data;
@@ -35,6 +39,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,6 +50,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    private ListView listView;
+
+    ModelAdapter modelAdapter;
 
     private static final String BASE_URL = "https://www.reddit.com/top/";
 
@@ -65,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
-                List<Data> dataList = new ArrayList<>();
+                ArrayList<Model> dataList = new ArrayList<>();
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
                 ArrayList<Children> childrenArrayList = response.body().getData().getChildren();
@@ -77,13 +86,18 @@ public class MainActivity extends AppCompatActivity {
                     String author = childrenArrayList.get(i).getData().getAuthor();
                     String thumbnail = childrenArrayList.get(i).getData().getThumbnail();
                     if(!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
-                        dataList.add(new Data(title, url, numComments, author, hours, thumbnail));
+                        dataList.add(new Model(title, url, numComments, author, hours, thumbnail));
                         Log.d(TAG, "onResponse: \n" +
-                                new Data(title, url, numComments, author, hours, thumbnail).toString() + "\n" +
+                                new Model(title, url, numComments, author, hours, thumbnail).toString() +"\n" +
                                 "---------------------------------------------------------\n\n");
                     }
 
                 }
+                listView = (ListView) findViewById(R.id.list_view);
+
+                modelAdapter = new ModelAdapter(MainActivity.this, dataList);
+
+                listView.setAdapter(modelAdapter);
             }
 
             @Override
