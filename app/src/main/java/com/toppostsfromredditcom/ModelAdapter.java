@@ -12,15 +12,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.toppostsfromredditcom.model.children.Data;
 
 import java.util.List;
 
 public class ModelAdapter extends BaseAdapter {
 
     Activity myActivity;
-    List<Model> models;
+    List<Data> models;
 
-    public ModelAdapter(Activity activity, List<Model> models){
+    public ModelAdapter(Activity activity, List<Data> models){
         this.myActivity = activity;
         this.models = models;
     }
@@ -31,7 +32,7 @@ public class ModelAdapter extends BaseAdapter {
     }
 
     @Override
-    public Model getItem(int i) {
+    public Data getItem(int i) {
         return models.get(i);
     }
 
@@ -49,21 +50,19 @@ public class ModelAdapter extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) myActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         oneModelLine = inflater.inflate(R.layout.row, viewGroup, false);
 
-        Model model = this.getItem(i);
+        Data model = this.getItem(i);
 
 
-        TextView author = (TextView) oneModelLine.findViewById(R.id.author);
-        TextView numComments = (TextView) oneModelLine.findViewById(R.id.num_comments);
-        TextView title = (TextView) oneModelLine.findViewById(R.id.title);
-        TextView created = (TextView) oneModelLine.findViewById(R.id.created);
-        Button save = (Button) oneModelLine.findViewById(R.id.btn_save);
-        ImageView imageView = (ImageView) oneModelLine.findViewById(R.id.thumbnail);
+        TextView author = oneModelLine.findViewById(R.id.author);
+        TextView numComments = oneModelLine.findViewById(R.id.num_comments);
+        TextView title = oneModelLine.findViewById(R.id.title);
+        TextView created = oneModelLine.findViewById(R.id.created);
+        ImageView imageView = oneModelLine.findViewById(R.id.thumbnail);
 
         author.setText("Posted by " + model.getAuthor());
         numComments.setText(model.getNumComments() + " comments");
         title.setText(model.getTitle());
         created.setText("Created " + (model.getCreated()) + " hours ago");
-        save.setText(model.getSave());
         Glide.with(oneModelLine).load(model.getUrl()).into(imageView);
 
         return oneModelLine;

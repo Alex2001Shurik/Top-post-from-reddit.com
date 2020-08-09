@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
-                ArrayList<Model> dataList = new ArrayList<>();
+                ArrayList<Data> dataList = new ArrayList<>();
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
                 ArrayList<Children> childrenArrayList = response.body().getData().getChildren();
@@ -72,9 +72,9 @@ public class MainActivity extends AppCompatActivity {
                     String author = childrenArrayList.get(i).getData().getAuthor();
                     String thumbnail = childrenArrayList.get(i).getData().getThumbnail();
                     if(!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
-                        dataList.add(new Model(title, url, numComments, author, hours, thumbnail));
+                        dataList.add(new Data(title, url, numComments, author, hours, thumbnail));
                         Log.d(TAG, "onResponse: \n" +
-                                new Model(title, url, numComments, author, hours, thumbnail).toString() +"\n" +
+                                new Data(title, url, numComments, author, hours, thumbnail).toString() +"\n" +
                                 "---------------------------------------------------------\n\n");
                     }
 
