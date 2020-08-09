@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
                 pagination = new Pagination(5, dataList);
                 lastPage = pagination.getLastPage();
+                updateData();
             }
 
             @Override
