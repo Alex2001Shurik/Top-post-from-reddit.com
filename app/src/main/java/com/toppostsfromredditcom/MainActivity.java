@@ -1,45 +1,23 @@
 package com.toppostsfromredditcom;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.toppostsfromredditcom.model.Feed;
 import com.toppostsfromredditcom.model.children.Children;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ListAdapter;
 
-import android.text.Editable;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.toppostsfromredditcom.model.children.Data;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,11 +27,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
+    Button next, previous;
+
     private static final String TAG = "MainActivity";
 
     private ListView listView;
 
-    ModelAdapter modelAdapter;
+    private ModelAdapter modelAdapter;
+
+    private Pagination pagination;
+
+    private int lastPage;
+
+    private int currentPage = 0;
 
     private static final String BASE_URL = "https://www.reddit.com/top/";
 
@@ -93,11 +79,10 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }
-                listView = (ListView) findViewById(R.id.list_view);
+                listView = findViewById(R.id.list_view);
 
-                modelAdapter = new ModelAdapter(MainActivity.this, dataList);
-
-                listView.setAdapter(modelAdapter);
+                pagination = new Pagination(5, dataList);
+                lastPage = pagination.getLastPage();
             }
 
             @Override
@@ -106,6 +91,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        next = findViewById(R.id.btn_next);
+        previous = findViewById(R.id.btn_previous);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentPage += 1;
+                updateData();
+            }
+        });
 
+        previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentPage -= 1;
+                updateData();
+            }
+        });
+
+
+    }
+    private void updateData(){
+        modelAdapter = new ModelAdapter(MainActivity.this, pagination.generateData(currentPage));
+        listView.setAdapter(modelAdapter);
+        updateButtons();
+    }
+
+    private void updateButtons() {
+        if(currentPage == 0){
+            next.setEnabled(true);
+            previous.setEnabled(false);
+        } else if(currentPage == lastPage){
+            next.setEnabled(false);
+            previous.setEnabled(true);
+        } else {
+            next.setEnabled(true);
+            previous.setEnabled(true);
+        }
     }
 }
