@@ -23,7 +23,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.toppostsfromredditcom.model.children.Data;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,10 +53,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnGetData = (Button) findViewById(R.id.btnGetData);
-
-        List<Data> dataList = new ArrayList<>();
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -70,22 +65,24 @@ public class MainActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
+                List<Data> dataList = new ArrayList<>();
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
                 ArrayList<Children> childrenArrayList = response.body().getData().getChildren();
-                for (int i = 0; i < childrenArrayList.size(); i++) {
+                for(int i = 0; i < childrenArrayList.size(); i++){
                     String title = childrenArrayList.get(i).getData().getTitle();
                     long hours = Data.convertDate(childrenArrayList.get(i).getData().getCreated());
                     String url = childrenArrayList.get(i).getData().getUrl();
                     long numComments = childrenArrayList.get(i).getData().getNumComments();
                     String author = childrenArrayList.get(i).getData().getAuthor();
                     String thumbnail = childrenArrayList.get(i).getData().getThumbnail();
-                    if (!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
+                    if(!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
                         dataList.add(new Data(title, url, numComments, author, hours, thumbnail));
                         Log.d(TAG, "onResponse: \n" +
                                 new Data(title, url, numComments, author, hours, thumbnail).toString() + "\n" +
                                 "---------------------------------------------------------\n\n");
                     }
+
                 }
             }
 
