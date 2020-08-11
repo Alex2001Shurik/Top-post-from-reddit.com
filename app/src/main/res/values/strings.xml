@@ -12,4 +12,5 @@
     <string name="hello_world">Hello world</string>
     <string name="get_data">Get data</string>
     <string name="save">SAVE</string>
+    <string name="detail">DETAIL</string>
 </resources>

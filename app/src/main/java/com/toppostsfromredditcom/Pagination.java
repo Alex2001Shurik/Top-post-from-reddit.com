@@ -18,6 +18,10 @@ public class Pagination {
         this.lastPageItems = models.size() % itemsPerPage;
     }
 
+    public ArrayList<Data> getModels() {
+        return models;
+    }
+
     public ArrayList<Data> generateData(int currentPage) {
         int startItem = currentPage * itemsPerPage;
         ArrayList<Data> newPageData = new ArrayList<>();

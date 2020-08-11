@@ -1,8 +1,14 @@
 package com.toppostsfromredditcom;
 
+import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import com.toppostsfromredditcom.model.Feed;
 import com.toppostsfromredditcom.model.children.Children;
 
@@ -12,12 +18,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.toppostsfromredditcom.model.children.Data;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,7 +39,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     Button next, previous;
 
@@ -43,10 +57,15 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String BASE_URL = "https://www.reddit.com/top/";
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -58,76 +77,101 @@ public class MainActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<Feed>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
+            //@Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
                 ArrayList<Data> dataList = new ArrayList<>();
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
                 ArrayList<Children> childrenArrayList = response.body().getData().getChildren();
-                for(int i = 0; i < childrenArrayList.size(); i++){
+                for (int i = 0; i < childrenArrayList.size(); i++) {
                     String title = childrenArrayList.get(i).getData().getTitle();
                     long hours = Data.convertDate(childrenArrayList.get(i).getData().getCreated());
                     String url = childrenArrayList.get(i).getData().getUrl();
                     long numComments = childrenArrayList.get(i).getData().getNumComments();
                     String author = childrenArrayList.get(i).getData().getAuthor();
                     String thumbnail = childrenArrayList.get(i).getData().getThumbnail();
-                    if(!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
+                    if (!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
                         dataList.add(new Data(title, url, numComments, author, hours, thumbnail));
                         Log.d(TAG, "onResponse: \n" +
-                                new Data(title, url, numComments, author, hours, thumbnail).toString() +"\n" +
+                                new Data(title, url, numComments, author, hours, thumbnail).toString() + "\n" +
                                 "---------------------------------------------------------\n\n");
                     }
 
-                }
-                listView = findViewById(R.id.list_view);
 
+                }
+                listView = findViewById(R.id.list);
                 pagination = new Pagination(5, dataList);
                 lastPage = pagination.getLastPage();
                 updateData();
             }
+
+
+
+
 
             @Override
             public void onFailure(Call<Feed> call, Throwable t) {
                 Log.e(TAG, "onFailure: Something went wrong" + t.getMessage());
             }
         });
-
         next = findViewById(R.id.btn_next);
         previous = findViewById(R.id.btn_previous);
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                currentPage += 1;
-                updateData();
-            }
+
+
+        next.setOnClickListener(view -> {
+            currentPage += 1;
+            updateData();
         });
 
-        previous.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                currentPage -= 1;
-                updateData();
-            }
+        previous.setOnClickListener(view -> {
+            currentPage -= 1;
+            updateData();
         });
 
 
     }
-    private void updateData(){
+
+    private void updateData() {
         modelAdapter = new ModelAdapter(MainActivity.this, pagination.generateData(currentPage));
         listView.setAdapter(modelAdapter);
         updateButtons();
     }
 
+
     private void updateButtons() {
-        if(currentPage == 0){
+        if (currentPage == 0) {
             next.setEnabled(true);
             previous.setEnabled(false);
-        } else if(currentPage == lastPage){
+        } else if (currentPage == lastPage) {
             next.setEnabled(false);
             previous.setEnabled(true);
         } else {
             next.setEnabled(true);
             previous.setEnabled(true);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public ArrayList<Data> getData() throws IOException {
+        InputStream in_s = this.getAssets().open("top.json");
+        Feed data;
+        JsonReader jsonReader = new JsonReader( new InputStreamReader(in_s, StandardCharsets.UTF_8));
+        Gson gson = new GsonBuilder().create();
+
+        data = gson.fromJson(jsonReader, Feed.class);
+        List<Children> children = data.getData().getChildren();
+        ArrayList<Data> dataList = new ArrayList<>();
+        for(int i = 0; i < children.size(); i++) {
+            String title = children.get(i).getData().getTitle();
+            long hours = Data.convertDate(children.get(i).getData().getCreated());
+            String url = children.get(i).getData().getUrl();
+            long numComments = children.get(i).getData().getNumComments();
+            String author = children.get(i).getData().getAuthor();
+            String thumbnail = children.get(i).getData().getThumbnail();
+            if (!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
+                dataList.add(new Data(title, url, numComments, author, hours, thumbnail));
+            }
+        }
+        return dataList;
     }
 }
