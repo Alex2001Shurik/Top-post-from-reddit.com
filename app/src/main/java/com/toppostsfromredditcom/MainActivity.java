@@ -1,5 +1,6 @@
 package com.toppostsfromredditcom;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import com.toppostsfromredditcom.model.children.Children;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.util.Log;
 
@@ -41,6 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends Activity {
 
+
     Button next, previous;
 
     private static final String TAG = "MainActivity";
@@ -59,13 +62,14 @@ public class MainActivity extends Activity {
 
 
 
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -77,7 +81,7 @@ public class MainActivity extends Activity {
 
         call.enqueue(new Callback<Feed>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
-            //@Override
+            @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
                 ArrayList<Data> dataList = new ArrayList<>();
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
@@ -96,19 +100,12 @@ public class MainActivity extends Activity {
                                 new Data(title, url, numComments, author, hours, thumbnail).toString() + "\n" +
                                 "---------------------------------------------------------\n\n");
                     }
-
-
                 }
                 listView = findViewById(R.id.list);
                 pagination = new Pagination(5, dataList);
                 lastPage = pagination.getLastPage();
                 updateData();
             }
-
-
-
-
-
             @Override
             public void onFailure(Call<Feed> call, Throwable t) {
                 Log.e(TAG, "onFailure: Something went wrong" + t.getMessage());
@@ -116,19 +113,14 @@ public class MainActivity extends Activity {
         });
         next = findViewById(R.id.btn_next);
         previous = findViewById(R.id.btn_previous);
-
-
         next.setOnClickListener(view -> {
             currentPage += 1;
             updateData();
         });
-
         previous.setOnClickListener(view -> {
             currentPage -= 1;
             updateData();
         });
-
-
     }
 
     private void updateData() {
@@ -151,7 +143,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    /*@RequiresApi(api = Build.VERSION_CODES.O)
     public ArrayList<Data> getData() throws IOException {
         InputStream in_s = this.getAssets().open("top.json");
         Feed data;
@@ -173,5 +165,5 @@ public class MainActivity extends Activity {
             }
         }
         return dataList;
-    }
+    }*/
 }
