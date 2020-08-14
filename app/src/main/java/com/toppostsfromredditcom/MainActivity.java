@@ -2,39 +2,24 @@ package com.toppostsfromredditcom;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 import com.toppostsfromredditcom.model.Feed;
 import com.toppostsfromredditcom.model.children.Children;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.util.Log;
 
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.toppostsfromredditcom.model.children.Data;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,6 +44,7 @@ public class MainActivity extends Activity {
     private int currentPage = 0;
 
     private static final String BASE_URL = "https://www.reddit.com/top/";
+
 
 
 
@@ -121,6 +107,19 @@ public class MainActivity extends Activity {
             currentPage -= 1;
             updateData();
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        //outState.putString(String.valueOf((++currentPage)), page.getText().toString());
+        super.onSaveInstanceState(outState);
+        outState.putInt("currentPage", currentPage);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        currentPage = savedInstanceState.getInt("currentPage");
     }
 
     private void updateData() {
