@@ -16,7 +16,6 @@ import android.util.Log;
 
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.toppostsfromredditcom.model.children.Data;
 import java.util.ArrayList;
@@ -111,7 +110,6 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        //outState.putString(String.valueOf((++currentPage)), page.getText().toString());
         super.onSaveInstanceState(outState);
         outState.putInt("currentPage", currentPage);
     }
@@ -141,28 +139,4 @@ public class MainActivity extends Activity {
             previous.setEnabled(true);
         }
     }
-
-    /*@RequiresApi(api = Build.VERSION_CODES.O)
-    public ArrayList<Data> getData() throws IOException {
-        InputStream in_s = this.getAssets().open("top.json");
-        Feed data;
-        JsonReader jsonReader = new JsonReader( new InputStreamReader(in_s, StandardCharsets.UTF_8));
-        Gson gson = new GsonBuilder().create();
-
-        data = gson.fromJson(jsonReader, Feed.class);
-        List<Children> children = data.getData().getChildren();
-        ArrayList<Data> dataList = new ArrayList<>();
-        for(int i = 0; i < children.size(); i++) {
-            String title = children.get(i).getData().getTitle();
-            long hours = Data.convertDate(children.get(i).getData().getCreated());
-            String url = children.get(i).getData().getUrl();
-            long numComments = children.get(i).getData().getNumComments();
-            String author = children.get(i).getData().getAuthor();
-            String thumbnail = children.get(i).getData().getThumbnail();
-            if (!thumbnail.equals("default") && (url.contains(".jpg") || url.contains(".png") || url.contains(".jpeg"))) {
-                dataList.add(new Data(title, url, numComments, author, hours, thumbnail));
-            }
-        }
-        return dataList;
-    }*/
 }

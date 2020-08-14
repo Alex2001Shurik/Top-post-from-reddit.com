@@ -108,7 +108,6 @@ public class Data {
         long created = Long.parseLong(date.toString() + "000");
         long epoch = Instant.now().toEpochMilli();
         long diff = epoch - created;
-        long diffHours = (int) (diff / (60 * 60 * 1000));
-        return diffHours;
+        return (int) (diff / (60 * 60 * 1000));
     }
 }

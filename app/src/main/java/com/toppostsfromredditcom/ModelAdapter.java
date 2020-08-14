@@ -69,7 +69,6 @@ public class ModelAdapter extends BaseAdapter {
         TextView title = oneModelLine.findViewById(R.id.title);
         TextView created = oneModelLine.findViewById(R.id.created);
         ImageView imageView = oneModelLine.findViewById(R.id.thumbnail);
-        Button save = oneModelLine.findViewById(R.id.btn_save);
 
         author.setText("Posted by " + model.getAuthor());
         numComments.setText(model.getNumComments() + " comments");
@@ -85,25 +84,6 @@ public class ModelAdapter extends BaseAdapter {
             myActivity.startActivity(intent);
         });
 
-        save.setOnClickListener(view1 -> {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
-            Bitmap bitmap = bitmapDrawable.getBitmap();
-
-            File file = Environment.getExternalStorageDirectory();
-            File dir = new File(file + "/Download/");
-            File outFIle = new File(dir, System.currentTimeMillis() + ".jpg");
-            try{
-                outputStream = new FileOutputStream(outFIle);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                outputStream.flush();
-                outputStream.close();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            save.setText("SAVED");
-            save.setEnabled(false);
-            Toast.makeText(myActivity, "Image is saved", Toast.LENGTH_SHORT).show();
-        });
 
         return oneModelLine;
     }
