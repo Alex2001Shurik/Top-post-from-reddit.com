@@ -7,16 +7,17 @@ import com.toppostsfromredditcom.model.children.Data;
 import java.util.ArrayList;
 
 public class Pagination {
-    private final int itemsPerPage, lastPageItems, lastPage;
-    private final ArrayList<Data> models;
+    private int itemsPerPage, lastPageItems, lastPage;
+    private ArrayList<Data> models;
 
 
     public Pagination(int itemsPerPage, ArrayList<Data> models) {
         this.itemsPerPage = itemsPerPage;
         this.models = models;
-        this.lastPage = models.size() / itemsPerPage;
-        this.lastPageItems = models.size() % itemsPerPage;
+        this.lastPage = models.size() % itemsPerPage == 0 ? (models.size() / itemsPerPage) - 1 : models.size() / itemsPerPage;
+        this.lastPageItems = models.size() % itemsPerPage == 0 ? itemsPerPage : models.size() % itemsPerPage;
     }
+
 
     public ArrayList<Data> getModels() {
         return models;
